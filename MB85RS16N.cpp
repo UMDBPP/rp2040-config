@@ -1,4 +1,4 @@
-#include "config.h"
+#include "MB85RS16N.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,53 +132,6 @@ int MB85RS16N::mem_init() {
     read_device_id();
     reset_wel();
     read_status_register();
-
-    return 0;
-}
-
-int MB85RS16N::write_config(Config_name cfg_name, Config cfg, uint8_t *buf,
-                            uint len) {
-    uint16_t addr = cfg.addrs[cfg_name];
-    uint cfg_len = cfg.len[cfg_name];
-
-    printf("Writing %d bytes to address %x\n", cfg_len, addr);
-
-    if (len > cfg_len) {
-        printf("config value (%d bytes) too long (%d bytes)\n", len, cfg_len);
-        return -1;
-    }
-
-    set_wel();
-
-    CS_LOW;
-    spi_write_blocking(spi, &write, 1);
-    spi_write16_blocking(spi, &addr, 1);
-    spi_write_blocking(spi, buf, cfg_len);
-    CS_HIGH;
-
-    reset_wel();
-
-    return 0;
-}
-int MB85RS16N::read_config(Config_name cfg_name, Config cfg, uint8_t *buf,
-                           uint len) {
-    uint16_t addr = cfg.addrs[cfg_name];
-    uint cfg_len = cfg.len[cfg_name];
-
-    printf("Reading %d bytes from address %x\n", cfg_len, addr);
-
-    if (len < cfg_len) {
-        printf(
-            "give buffer too small (%d bytes) to contain config (%d bytes)\n",
-            len, cfg_len);
-        return -1;
-    }
-
-    CS_LOW;
-    printf("Writing op code %d\n", spi_write_blocking(spi, &read, 1));
-    printf("Writing address %d\n", spi_write16_blocking(spi, &addr, 1));
-    printf("Reading value %d\n", spi_read_blocking(spi, 0, buf, cfg_len));
-    CS_HIGH;
 
     return 0;
 }
