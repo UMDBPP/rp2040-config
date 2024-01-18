@@ -41,10 +41,10 @@ int MB85RS16N::read_status_register() {
     spi_read_blocking(spi, 0, &buf, 1);
     CS_HIGH;
 
-    wpen = (buf & WPEN_MASK != 0) ? true : false;
-    bp1 = (buf & BP1_MASK != 0) ? true : false;
-    bp0 = (buf & BP0_MASK != 0) ? true : false;
-    wel = (buf & WEL_MASK != 0) ? true : false;
+    wpen = ((buf & WPEN_MASK) != 0) ? true : false;
+    bp1 = ((buf & BP1_MASK) != 0) ? true : false;
+    bp0 = ((buf & BP0_MASK) != 0) ? true : false;
+    wel = ((buf & WEL_MASK) != 0) ? true : false;
 
     printf("Device %d status register: %x\n", device_id, buf);
 
@@ -63,6 +63,8 @@ int MB85RS16N::write_status_register(uint8_t reg) {
 }
 
 int MB85RS16N::read_memory(uint16_t addr, uint8_t *buf, uint len) {
+    printf("reading memory address %x\n", addr);
+
     CS_LOW;
     spi_write_blocking(spi, &read, 1);
     spi_write16_blocking(spi, &addr, 1);
@@ -75,10 +77,27 @@ int MB85RS16N::read_memory(uint16_t addr, uint8_t *buf, uint len) {
 int MB85RS16N::write_memory(uint16_t addr, uint8_t *buf, uint len) {
     set_wel();
 
+    read_status_register();
+
+    if (!wel) {
+        printf("memory not writeable\n");
+        return -1;
+    }
+
     CS_LOW;
-    spi_write_blocking(spi, &write, 1);
-    spi_write16_blocking(spi, &addr, 1);
-    spi_write_blocking(spi, buf, len);
+    if (spi_write_blocking(spi, &write, 1) != 1) {
+        printf("Error writing WRITE op-code");
+        return -1;
+    }
+
+    if (spi_write16_blocking(spi, &addr, 1) != 1) {
+        printf("Error writing memory address");
+        return -1;
+    }
+    if (spi_write_blocking(spi, buf, len) != len) {
+        printf("Error writing data");
+        return -1;
+    }
     CS_HIGH;
 
     return 0;
@@ -112,8 +131,6 @@ int MB85RS16N::mem_init() {
 
     read_device_id();
     reset_wel();
-    read_status_register();
-    set_wel();
     read_status_register();
 
     return 0;
