@@ -1,7 +1,6 @@
 #include "MB85RS16N.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "hardware/gpio.h"
@@ -48,7 +47,7 @@ int MB85RS16N::read_status_register() {
     bp0 = ((buf & BP0_MASK) != 0) ? true : false;
     wel = ((buf & WEL_MASK) != 0) ? true : false;
 
-    printf("Device %d status register: %x\n", device_id, buf);
+    // printf("Device %d status register: %x\n", device_id, buf);
 
     return 0;
 }
@@ -135,7 +134,7 @@ int MB85RS16N::mem_init() {
 
     read_device_id();
     reset_wel();
-    read_status_register();
+    // read_status_register();
 
     return 0;
 }
