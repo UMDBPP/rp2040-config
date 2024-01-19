@@ -67,7 +67,7 @@ int MB85RS16N::read_memory(uint16_t addr, uint8_t *buf, uint len) {
 
     CS_LOW;
     spi_write_blocking(spi, &read, 1);
-    spi_write16_blocking(spi, &addr, 1);
+    spi_write_blocking(spi, (uint8_t *)(&addr), 2);
     spi_read_blocking(spi, 0, buf, len);
     CS_HIGH;
 
@@ -90,7 +90,7 @@ int MB85RS16N::write_memory(uint16_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
-    if (spi_write16_blocking(spi, &addr, 1) != 1) {
+    if (spi_write_blocking(spi, (uint8_t *)(&addr), 2) != 2) {
         printf("Error writing memory address");
         return -1;
     }
