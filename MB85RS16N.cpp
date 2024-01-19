@@ -17,6 +17,8 @@
 #define WP_HIGH gpio_put(wp_pin, 1);
 #define WP_LOW gpio_put(wp_pin, 0);
 
+#define REV(x) ((0x00FF & x) << 8) | ((0xFF00 & x) >> 8)  // for 16-bit numbers
+
 int MB85RS16N::set_wel(void) {
     CS_LOW;
     spi_write_blocking(spi, &wren, 1);
@@ -63,11 +65,11 @@ int MB85RS16N::write_status_register(uint8_t reg) {
 }
 
 int MB85RS16N::read_memory(uint16_t addr, uint8_t *buf, uint len) {
-    printf("reading memory address %x\n", addr);
+    uint16_t mod_addr = REV(addr);
 
     CS_LOW;
     spi_write_blocking(spi, &read, 1);
-    spi_write_blocking(spi, (uint8_t *)(&addr), 2);
+    spi_write_blocking(spi, (uint8_t *)(&mod_addr), 2);
     spi_read_blocking(spi, 0, buf, len);
     CS_HIGH;
 
@@ -84,13 +86,15 @@ int MB85RS16N::write_memory(uint16_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
+    uint16_t mod_addr = REV(addr);
+
     CS_LOW;
     if (spi_write_blocking(spi, &write, 1) != 1) {
         printf("Error writing WRITE op-code");
         return -1;
     }
 
-    if (spi_write_blocking(spi, (uint8_t *)(&addr), 2) != 2) {
+    if (spi_write_blocking(spi, (uint8_t *)(&mod_addr), 2) != 2) {
         printf("Error writing memory address");
         return -1;
     }
