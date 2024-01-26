@@ -34,7 +34,7 @@ int read_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
 
     if (len < cfg_len) {
         printf(
-            "give buffer too small (%d bytes) to contain config (%d bytes)\n",
+            "given buffer too small (%d bytes) to contain config (%d bytes)\n",
             len, cfg_len);
         return -1;
     }
