@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../MB85RS16N.h"
+#include "../../MB85RS1MT.h"
 #include "../../config.h"
 #include "hardware/gpio.h"
 #include "hardware/spi.h"
@@ -15,7 +15,7 @@ const uint cs_pin = 1;
 const uint wp_pin = 9;
 const uint hold_pin = 7;
 
-MB85RS16N mem(spi, cs_pin, sck_pin, mosi_pin, miso_pin, wp_pin, hold_pin);
+MB85RS1MT mem(spi, cs_pin, sck_pin, mosi_pin, miso_pin, wp_pin, hold_pin);
 
 Config test_config;
 

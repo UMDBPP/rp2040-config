@@ -10,7 +10,7 @@ pico_sdk_init()
 add_executable(config-example 
     name.cpp
     ../../config.cpp
-    ../../MB85RS16N.cpp
+    ../../MB85RS1MT.cpp
 )
 
 pico_enable_stdio_usb(config-example 1)

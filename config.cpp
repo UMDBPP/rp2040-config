@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "MB85RS16N.h"
+#include "MB85RS1MT.h"
 #include "hardware/gpio.h"
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
 int write_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
-                 MB85RS16N *mem) {
+                 MB85RS1MT *mem) {
     uint16_t addr = cfg.addrs[cfg_name];
     uint cfg_len = cfg.len[cfg_name];
 
@@ -26,7 +26,7 @@ int write_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
 }
 
 int read_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
-                MB85RS16N *mem) {
+                MB85RS1MT *mem) {
     uint16_t addr = cfg.addrs[cfg_name];
     uint cfg_len = cfg.len[cfg_name];
 
