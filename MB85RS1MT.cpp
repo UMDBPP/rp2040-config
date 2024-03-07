@@ -78,10 +78,12 @@ int MB85RS1MT::write_status_register(uint8_t reg) {
 
 int MB85RS1MT::read_memory(uint32_t addr, uint8_t *buf, uint len) {
     uint32_t mod_addr = addr;  // REV24(addr)
+    uint8_t addr_buf[] = {(0x00FF0000 & addr) >> 16, (0x0000FF00 & addr) >> 8,
+                          0x000000FF & addr};
 
     CS_LOW;
     spi_write_blocking(spi, &read, 1);
-    spi_write_blocking(spi, (uint8_t *)(&mod_addr), 3);
+    spi_write_blocking(spi, addr_buf, 3);
     spi_read_blocking(spi, 0, buf, len);
     CS_HIGH;
 
@@ -99,6 +101,8 @@ int MB85RS1MT::write_memory(uint32_t addr, uint8_t *buf, uint len) {
     }
 
     uint32_t mod_addr = addr;  // REV24(addr)
+    uint8_t addr_buf[] = {(0x00FF0000 & addr) >> 16, (0x0000FF00 & addr) >> 8,
+                          0x000000FF & addr};
 
     CS_LOW;
     if (spi_write_blocking(spi, &write, 1) != 1) {
@@ -106,7 +110,7 @@ int MB85RS1MT::write_memory(uint32_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
-    if (spi_write_blocking(spi, (uint8_t *)(&mod_addr), 3) != 3) {
+    if (spi_write_blocking(spi, addr_buf, 3) != 3) {
         printf("Error writing memory address");
         return -1;
     }
