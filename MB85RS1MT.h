@@ -10,6 +10,7 @@
 #define BP1_MASK 0x08
 #define BP0_MASK 0x04
 #define WEL_MASK 0x02
+#define MAX_ADDR 131072
 
 class MB85RS1MT {
    public:

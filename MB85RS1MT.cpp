@@ -100,6 +100,15 @@ int MB85RS1MT::write_memory(uint32_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
+    if (addr > MAX_ADDR) {
+        printf("address too large");
+        return -1;
+    }
+
+    if (addr + len > MAX_ADDR) {
+        len = MAX_ADDR - addr;
+    }
+
     uint32_t mod_addr = addr;  // REV24(addr)
     uint8_t addr_buf[] = {(0x00FF0000 & addr) >> 16, (0x0000FF00 & addr) >> 8,
                           0x000000FF & addr};
@@ -141,13 +150,13 @@ int MB85RS1MT::mem_init() {
     gpio_set_dir(cs_pin, GPIO_OUT);
     gpio_put(cs_pin, 1);
 
-    if (wp_pin > 29) {
+    if (wp_pin <= 29) {
         gpio_init(wp_pin);
         gpio_set_dir(wp_pin, GPIO_OUT);
         gpio_put(wp_pin, 0);
     }
 
-    if (hold_pin > 29) {
+    if (hold_pin <= 29) {
         gpio_init(hold_pin);
         gpio_set_dir(hold_pin, GPIO_OUT);
         gpio_put(hold_pin, 1);
