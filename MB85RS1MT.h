@@ -10,6 +10,7 @@
 #define BP1_MASK 0x08
 #define BP0_MASK 0x04
 #define WEL_MASK 0x02
+#define MAX_ADDR 131072
 
 class MB85RS1MT {
    public:
@@ -67,14 +68,14 @@ class MB85RS1MT {
     /**
      * Reads a given number of bytes from the memory starting at the given
      * address
-     * @param addr 16-bit address, only the lower 11 bits are used
+     * @param addr 232-bit address, only the lower 24 bits are used
      */
     int read_memory(uint32_t addr, uint8_t *buf, uint len);
 
     /**
      * Writes a given number of bytes to the memory starting at the given
      * address
-     * @param addr 16-bit address, only the lower 11 bits are used
+     * @param addr 32-bit address, only the lower 24 bits are used
      */
     int write_memory(uint32_t addr, uint8_t *buf, uint len);
 

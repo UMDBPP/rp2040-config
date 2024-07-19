@@ -25,7 +25,11 @@ const uint8_t read = 0x03;   // Read memory code
 const uint8_t write = 0x02;  // Write memory code
 const uint8_t rdid = 0x9F;   // Read device ID
 
-#define REV(x) ((0x00FF & x) << 8) | ((0xFF00 & x) >> 8)  // for 16-bit numbers
+#define REV16(x) \
+    ((0x00FF & x) << 8) | ((0xFF00 & x) >> 8)  // for 16-bit numbers
+
+#define REV24(x) \
+    ((0x000000FF & x) << 16) | ((0x00FF0000 & x) >> 16)  // for 24-bit numbers
 
 int MB85RS1MT::set_wel(void) {
     CS_LOW;
@@ -73,11 +77,13 @@ int MB85RS1MT::write_status_register(uint8_t reg) {
 }
 
 int MB85RS1MT::read_memory(uint32_t addr, uint8_t *buf, uint len) {
-    uint32_t mod_addr = REV(addr);
+    uint32_t mod_addr = addr;  // REV24(addr)
+    uint8_t addr_buf[] = {(0x00FF0000 & addr) >> 16, (0x0000FF00 & addr) >> 8,
+                          0x000000FF & addr};
 
     CS_LOW;
     spi_write_blocking(spi, &read, 1);
-    spi_write_blocking(spi, (uint8_t *)(&mod_addr), 3);
+    spi_write_blocking(spi, addr_buf, 3);
     spi_read_blocking(spi, 0, buf, len);
     CS_HIGH;
 
@@ -94,7 +100,18 @@ int MB85RS1MT::write_memory(uint32_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
-    uint32_t mod_addr = REV(addr);
+    if (addr > MAX_ADDR) {
+        printf("address too large");
+        return -1;
+    }
+
+    if (addr + len > MAX_ADDR) {
+        len = MAX_ADDR - addr;
+    }
+
+    uint32_t mod_addr = addr;  // REV24(addr)
+    uint8_t addr_buf[] = {(0x00FF0000 & addr) >> 16, (0x0000FF00 & addr) >> 8,
+                          0x000000FF & addr};
 
     CS_LOW;
     if (spi_write_blocking(spi, &write, 1) != 1) {
@@ -102,7 +119,7 @@ int MB85RS1MT::write_memory(uint32_t addr, uint8_t *buf, uint len) {
         return -1;
     }
 
-    if (spi_write_blocking(spi, (uint8_t *)(&mod_addr), 3) != 3) {
+    if (spi_write_blocking(spi, addr_buf, 3) != 3) {
         printf("Error writing memory address");
         return -1;
     }
@@ -133,13 +150,13 @@ int MB85RS1MT::mem_init() {
     gpio_set_dir(cs_pin, GPIO_OUT);
     gpio_put(cs_pin, 1);
 
-    if (wp_pin > 29) {
+    if (wp_pin <= 29) {
         gpio_init(wp_pin);
         gpio_set_dir(wp_pin, GPIO_OUT);
         gpio_put(wp_pin, 0);
     }
 
-    if (hold_pin > 29) {
+    if (hold_pin <= 29) {
         gpio_init(hold_pin);
         gpio_set_dir(hold_pin, GPIO_OUT);
         gpio_put(hold_pin, 1);

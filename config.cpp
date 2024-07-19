@@ -10,7 +10,7 @@
 
 int write_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
                  MB85RS1MT *mem) {
-    uint16_t addr = cfg.addrs[cfg_name];
+    uint32_t addr = cfg.addrs[cfg_name];
     uint cfg_len = cfg.len[cfg_name];
 
     // printf("Writing %d bytes to address %x\n", cfg_len, addr);
@@ -27,7 +27,7 @@ int write_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
 
 int read_config(Config_name cfg_name, Config cfg, uint8_t *buf, uint len,
                 MB85RS1MT *mem) {
-    uint16_t addr = cfg.addrs[cfg_name];
+    uint32_t addr = cfg.addrs[cfg_name];
     uint cfg_len = cfg.len[cfg_name];
 
     // printf("Reading %d bytes from address %x\n", cfg_len, addr);
