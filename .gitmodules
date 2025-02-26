@@ -6,3 +6,6 @@
 	path = fatfs
 	url = https://github.com/abbrev/fatfs.git
 	branch = master
+[submodule "littlefs"]
+	path = littlefs
+	url = https://github.com/littlefs-project/littlefs.git
